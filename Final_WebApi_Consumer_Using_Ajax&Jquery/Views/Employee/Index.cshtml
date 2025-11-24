@@ -1,0 +1,184 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="~/Scripts/jquery-3.7.1.min.js"></script>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script>
+        function GetEmployees() {
+            $.ajax({
+                url: 'http://localhost/Final_WebApi_CRUD/Api/Employee',
+                type: 'get',
+                dataType: 'json',
+                success: BuildTable,
+                error: function (response) {
+                    window.alert("Faild to Load the Employee Record !!");
+                }
+            });
+        }
+        function BuildTable(Employee) {
+            // Clear existing table rows
+            $('#tblEmployee tbody').empty();
+
+            // Loop through each employee and append row
+            $.each(Employee, function (Index, emp) {
+                $('#tblEmployee tbody').append(
+                    '<tr>' +
+                    '<td align="center">' + emp.Emp_Id + '</td>' +
+                    '<td>' + emp.Emp_Name + '</td>' +
+                    '<td align="right">' + emp.Designation + '</td>' +
+                    '<td>' + emp.Salary + '</td>' +
+                    '<td align="center">' + emp.Mobile_No + '</td>' +
+                    '</tr>'
+                );
+            });
+        }
+
+        function GetEmployee() {
+            var id = $('#EmpId').val();
+            if (!id) {
+                window.alert("Please Enter Employee Id !!");
+                return;
+            }
+            $.ajax({
+                url: 'http://localhost/Final_WebApi_CRUD/Api/Employee/' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function (Employee) {
+                    $('#Name').val(Employee.Emp_Name);
+                    $('#Designation').val(Employee.Designation);
+                    $('#Salary').val(Employee.Salary);
+                    $('#Mobile').val(Employee.Mobile_No);
+                },
+                error: function (response) {
+                    window.alert("Failed to Get Employee Record by Id!");
+                    ClearAndLoad();
+                }
+            });
+        }
+
+        function AddEmployee() {
+            $.ajax({
+                url: 'http://localhost/Final_WebApi_CRUD/Api/Employee',
+                type: 'post',
+                dataType: 'json',
+                data: $('#frmEmployee').serialize(),
+                success: function (response) {
+                    window.alert("Employee Added Sussessfully");
+                    ClearAndLoad();
+                },
+                error: function (response) {
+                    window.alert("Faild to Add New Employee !!");
+                }
+            });
+        }
+        function UpdateEmployee() {
+            var id = $('#EmpId').val();
+            $.ajax({
+                url: 'http://localhost/Final_WebApi_CRUD/Api/Employee/' + id,
+                type: 'put',
+                dataType: 'json',
+                data: $('#frmEmployee').serialize(),
+                success: function (response) {
+                    window.alert("Employee Updated Sussessfully");
+                    ClearAndLoad();
+                },
+                error: function (response) {
+                    window.alert("Faild to Update Record !!");
+                }
+            });
+        }
+
+        function DeleteEmployee() {
+            var id = $('#EmpId').val();
+            if (!id) {
+                alert("Please enter valid Employee ID");
+                return;
+            }
+            var Status = confirm('Are you sure of deleting the current record?');
+            if (Status) {
+                $.ajax({
+                    url: 'http://localhost/Final_WebApi_CRUD/Api/Employee/' + id,
+                    type: 'delete',
+                    dataType: 'json',
+                    success: function (response) {
+                        alert("Record Deleted Successfully !!");
+                        ClearAndLoad();
+                    },
+                    error: function (response) {
+                        window.alert("Faild to Delete Record !!");
+                    }
+                });
+            }
+        }
+        function ClearAndLoad() {
+            $('#frmEmployee').trigger("reset");
+            GetEmployees();
+            $('#EmpId').focus();
+        }
+    </script>
+</head>
+<body onload="GetEmployees()">
+    <table width="100%">
+        <tr>
+            <td valign="top" style="width:60%">
+                <table border="1" align="center" id="tblEmployee" style="width:100%">
+                    <caption><strong>Employee Details</strong></caption>
+                    <thead>
+                        <tr>
+                            <th>Employee Id: </th>
+                            <th>Employee Name: </th>
+                            <th>Designation: </th>
+                            <th>Salary: </th>
+                            <th>Mobile No: </th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </td>
+            <td valign="top" style="width:40%">
+                <form id="frmEmployee">
+                    <table align="center">
+                        <tr>
+                            <td>Employee Id:</td>
+                            <td>
+                                <input id="EmpId" name="Emp_Id" />
+                                <input type="button" id="btnSearch" name="Emp_Id" value="Search" onclick="GetEmployee()" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Employee Name:</td>
+                            <td><input id="Name" name="Emp_Name" /></td>
+                        </tr>
+                        <tr>
+                            <td>Designation:</td> 
+                            <td><input id="Designation" name="Designation" /></td>
+                        </tr>
+                        <tr>
+                            <td>Salary:</td>
+                            <td><input id="Salary" name="Salary" /></td>
+                        </tr>
+                        <tr>
+                            <td>Mobile No:</td>
+                            <td><input id="Mobile" name="Mobile_No" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="center">
+                                <input type="button" id="btnInsert" name="btnInsert" value="Insert" onclick="AddEmployee()" />
+                                <input type="button" id="btnUpdate" name="btnUpdate" value="Update" onclick="UpdateEmployee()" />
+                                <input type="button" id="btnDelete" name="btnDelete" value="Delete" onclick="DeleteEmployee()" />
+                                <input type="reset" id="btnReset" name="btnReset" value="Clear" />
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+        </tr>
+    </table>
+</body>
+
+
+</html>
